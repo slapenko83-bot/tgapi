@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- Вкладка 1: ПОДПИСИ -->
+    <!-- Вкладки экранов -->
     <div id="tab-signatures" class="tab-content" style="display: block;">
         <div id="seller-actions" style="display: none; margin-bottom: 20px;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
@@ -60,25 +60,17 @@
                 <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
             </div>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #ffffff; font-size: 16px; font-weight: 500; margin: 0;">Нет активных продавцов</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #ffffff; font-size: 16px; font-weight: 500;">Нет активных продавцов</p></div>
     </div>
 
-    <!-- Вкладка 2: ЧАТЫ -->
     <div id="tab-chats" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #8e8e93; font-size: 16px; font-weight: 500; margin: 0;">У вас нет activeных чатов</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">У вас нет активных чатов</p></div>
     </div>
 
-    <!-- Вкладка 3: СПОРЫ -->
     <div id="tab-disputes" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #8e8e93; font-size: 16px; font-weight: 500; margin: 0;">Нет активных споров</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">Нет активных споров</p></div>
     </div>
-    <!-- Вкладка 4: ПРОФИЛЬ -->
+
     <div id="tab-profile" class="tab-content">
         <div style="display: flex; align-items: center; margin-bottom: 24px; padding: 10px 0;">
             <div onclick="changeAvatar()" style="width: 70px; height: 70px; border-radius: 50%; background-color: #2c2c2e; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #007aff; overflow: hidden; flex-shrink: 0;">
@@ -105,14 +97,14 @@
         </div>
     </div>
 
-    <!-- Нижняя панель навигации (Теперь она вынесена за пределы всех экранов) -->
+    <!-- Навигация -->
     <div class="nav-bar">
         <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
         <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')"><span class="nav-icon">💬</span><span class="nav-label">чаты</span></button>
         <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
-        <script>
+    <script>
         var tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -126,18 +118,13 @@
                 
                 var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
                 
-                // Простейший и 100% безопасный разбор строки через поиск индексов текста
+                // Исправленный 100% стабильный разбор строки параметров
                 if (startParam && startParam.indexOf("id-") !== -1) {
-                    var idxId = startParam.indexOf("id-") + 3;
-                    var idxName = startParam.indexOf("-name-");
-                    var idxUser = startParam.indexOf("-user-");
-                    
-                    if (idxName !== -1) {
-                        userId = startParam.substring(idxId, idxName);
-                    }
-                    if (idxUser !== -1) {
-                        firstName = decodeURIComponent(startParam.substring(idxName + 6, idxUser));
-                        username = decodeURIComponent(startParam.substring(idxUser + 6));
+                    var items = startParam.split("-");
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i] === "id") userId = items[i+1];
+                        if (items[i] === "name") firstName = decodeURIComponent(items[i+1]);
+                        if (items[i] === "user") username = decodeURIComponent(items[i+1]);
                     }
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     var user = tg.initDataUnsafe.user;
@@ -157,6 +144,7 @@
         }
         
         initWebApp();
+
         var isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
@@ -203,4 +191,3 @@
     </script>
 </body>
 </html>
-
