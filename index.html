@@ -50,6 +50,7 @@
     </style>
 </head>
 <body>
+<body>
 
     <!-- Шапка -->
     <div class="header-container">
@@ -97,8 +98,9 @@
     <!-- Экран 2: ЧАТЫ -->
     <div id="tab-chats" class="tab-content">
         <div class="card">
-            <h3>💬 Ваши диалоги</h3>
-            <p>Список активных комнат переговоров по текущим ордерам.</p>
+            <h3>💬 Активные чаты с продавцами</h3>
+            <!-- Сюда JS автоматически вставит список чатов или надпись об их отсутствии -->
+            <div id="chats-container"></div>
         </div>
     </div>
 
@@ -162,6 +164,31 @@
             document.getElementById('seller-actions').style.display = "none";
         }
 
+        // --- ЛОГИКА ОТОБРАЖЕНИЯ ЧАТОВ ---
+        // Массив с активными чатами (сейчас он пустой для теста условия)
+        let activeChats = []; 
+
+        function renderChats() {
+            const container = document.getElementById('chats-container');
+            if (activeChats.length === 0) {
+                // Если чатов нет, выводим вашу фразу
+                container.innerHTML = `<p style="color: #8e8e93; margin: 10px 0 0 0;">У вас нет активных чатов</p>`;
+            } else {
+                // Если чаты появятся, они отобразятся списком ниже
+                container.innerHTML = "";
+                activeChats.forEach(chat => {
+                    container.innerHTML += `
+                        <div style="padding: 10px 0; border-bottom: 1px solid #2c2c2e; margin-top: 10px;">
+                            <span style="font-weight: bold; color: #007aff;">👤 Продавец: ${chat.seller}</span><br>
+                            <span style="font-size: 12px; color: #aeaeae;">Товар: ${chat.item}</span>
+                        </div>`;
+                });
+            }
+        }
+
+        // Вызываем отрисовку чатов при загрузке страницы
+        renderChats();
+
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
             const statusText = document.getElementById('status-text');
@@ -212,3 +239,4 @@
     </script>
 </body>
 </html>
+
