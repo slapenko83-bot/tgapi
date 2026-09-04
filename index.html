@@ -112,7 +112,7 @@
         <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
-    <script>
+        <script>
         var tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -124,17 +124,21 @@
                 var firstName = "Пользователь";
                 var username = "tg_user";
                 
-                // Считываем параметры, переданные ботом
                 var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
                 
-                if (startParam && startParam.indexOf("-") !== -1) {
-                    var rawId = startParam.match(/id-([^-]+)/);
-                    var rawName = startParam.match(/name-([^-]+)/);
-                    var rawUser = startParam.match(/user-([^-]+)/);
+                // Простейший и 100% безопасный разбор строки через поиск индексов текста
+                if (startParam && startParam.indexOf("id-") !== -1) {
+                    var idxId = startParam.indexOf("id-") + 3;
+                    var idxName = startParam.indexOf("-name-");
+                    var idxUser = startParam.indexOf("-user-");
                     
-                    if (rawId && rawId[1]) userId = rawId[1];
-                    if (rawName && rawName[1]) firstName = decodeURIComponent(rawName[1]);
-                    if (rawUser && rawUser[1]) username = decodeURIComponent(rawUser[1]);
+                    if (idxName !== -1) {
+                        userId = startParam.substring(idxId, idxName);
+                    }
+                    if (idxUser !== -1) {
+                        firstName = decodeURIComponent(startParam.substring(idxName + 6, idxUser));
+                        username = decodeURIComponent(startParam.substring(idxUser + 6));
+                    }
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     var user = tg.initDataUnsafe.user;
                     userId = user.id;
@@ -153,7 +157,6 @@
         }
         
         initWebApp();
-
         var isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
@@ -200,3 +203,4 @@
     </script>
 </body>
 </html>
+
