@@ -91,50 +91,40 @@
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш реферальный процент:</span><span style="font-weight: 600; color: #007aff;" id="prof-ref-percent">5%</span></div>
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <span style="color: #8e8e93;">Ваша реф. ссылка:</span>
-                <div style="display: flex; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; align-items: center; justify-content: space-between;">
-                    <span id="prof-ref-link" style="font-size: 13px; color: #aeaeae; word-break: break-all; padding-right: 8px;">https://t.me</span>
-                    <button onclick="copyRefLink()" style="background-color: #007aff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Копировать</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Навигация -->
-    <div class="nav-bar">
-        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
-        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')"><span class="nav-icon">💬</span><span class="nav-label">чаты</span></button>
-        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
-        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
-    </div>
-
-    <script>
-        var tg = window.Telegram.WebApp;
-        tg.ready();
+                <script>
+        const tg = window.Telegram.WebApp;
         tg.expand();
+        
+        // Небольшая задержка, чтобы гарантированно получить данные
+        setTimeout(() => {
+            const user = tg.initDataUnsafe.user;
+            
+            if (!user) {
+                console.log("User data not available");
+                return;
+            }
+            
+            // Выводим username или имя
+            const usernameEl = document.getElementById('userUsername');
+            if (user.username) {
+                usernameEl.innerHTML = `@<span style="color: var(--tg-theme-text-color, #222222);">${user.username}</span>`;
+            } else if (user.first_name) {
+                usernameEl.textContent = user.first_name;
+            } else {
+                usernameEl.textContent = 'Пользователь';
+            }
+            
+            // Выводим аватарку
+            const avatarEl = document.getElementById('userAvatar');
+            // Пытаемся разные варианты аватара
+            if (user.is_premium) {
+                avatarEl.src = `https://t.me/i/user_${user.id}_premium.jpg`;
+            } else {
+                avatarEl.src = `https://t.me/i/user_${user.id}.jpg`;
+            }
+        }, 300); // 300мс подождем, чтобы WebApp успел загрузиться
+</script>
 
-        document.addEventListener("DOMContentLoaded", function() {
-            initWebAppForce();
-        });
-
-        function initWebAppForce() {
-            try {
-                var userId = "0";
-                var firstName = "Пользователь";
-                var username = "tg_user";
-
-                var webAppUser = null;
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    webAppUser = tg.initDataUnsafe.user;
-                } else if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-                    webAppUser = window.Telegram.WebApp.initDataUnsafe.user;
-                }
-
-                if (webAppUser) {
-                    userId = webAppUser.id ? webAppUser.id.toString() : "0";
-                    firstName = webAppUser.first_name || "Пользователь";
-                    username = webAppUser.username || "user";
-                } else {
-                    var searchParams = new URLSearchParams(window.location.search);
-                    var tgWebAppData = searchParams.get("tgWebAppData") || window.location.hash;
                     
                     if (tgWebAppData) {
                         var decodedData = decodeURIComponent(tgWebAppData);
