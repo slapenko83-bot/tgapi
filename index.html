@@ -1,3 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Market</title>
+    <!-- Официальный скрипт Telegram (Обязательно в head) -->
+    <script src="https://telegram.org"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 16px 16px 120px 16px; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1c1c1e; }
+        .user-info h1 { font-size: 20px; margin: 0; font-weight: 700; }
+        .user-info p { font-size: 13px; color: #8e8e93; margin: 4px 0 0 0; }
+        .status-container { display: none; align-items: center; gap: 8px; }
+        .status-label { font-size: 12px; font-weight: 600; color: #8e8e93; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2c2c2e; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #007aff; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .tab-content { display: none; }
+        .card { background-color: #1c1c1e; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #2c2c2e; }
+        .btn-primary { background-color: #007aff; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #8e8e93; margin-bottom: 4px; }
+        .form-group input, .form-group textarea { width: 100%; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; color: white; box-sizing: border-box; font-family: inherit; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #1c1c1e; border-top: 1px solid #2c2c2e; display: flex; justify-content: space-around; align-items: center; padding-top: 10px; padding-bottom: max(18px, env(safe-area-inset-bottom)); box-sizing: border-box; z-index: 999999; }
+        .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: #8e8e93; cursor: pointer; width: 24%; height: 50px; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        .nav-icon { font-size: 18px; margin-bottom: 2px; pointer-events: none; }
+        .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; pointer-events: none; }
+        .nav-button.active { color: #007aff !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="user-info">
+            <h1 id="role-title">Покупатель</h1>
+            <p id="user-greeting-top">Загрузка...</p>
+        </div>
+        <div class="status-container" id="seller-status-block">
+            <span class="status-label" id="status-text">ОФФЛАЙН</span>
+            <label class="switch">
+                <input type="checkbox" id="status-toggle" onchange="toggleStatus()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Вкладки экранов -->
+    <div id="tab-signatures" class="tab-content" style="display: block;">
+        <div id="seller-actions" style="display: none; margin-bottom: 20px;">
+            <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
+            <div id="product-form" class="card" style="display: none; border-color: #007aff;">
+                <h3>Новое объявление</h3>
+                <div class="form-group"><label>Название товара</label><input type="text" id="prod-name"></div>
+                <div class="form-group"><label>Описание</label><textarea id="prod-desc" rows="3"></textarea></div>
+                <div class="form-group"><label>Цена (₽)</label><input type="number" id="prod-price"></div>
+                <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #ffffff; font-size: 16px; font-weight: 500;">Нет активных продавцов</p></div>
+    </div>
+
+    <div id="tab-chats" class="tab-content">
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">У вас нет активных чатов</p></div>
+    </div>
+
+    <div id="tab-disputes" class="tab-content">
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">Нет активных споров</p></div>
+    </div>
+    <div id="tab-profile" class="tab-content">
+        <div style="display: flex; align-items: center; margin-bottom: 24px; padding: 10px 0;">
+            <div onclick="changeAvatar()" style="width: 70px; height: 70px; border-radius: 50%; background-color: #2c2c2e; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #007aff; overflow: hidden; flex-shrink: 0;">
+                <span id="avatar-placeholder" style="font-size: 28px; color: #8e8e93;">👤</span>
+                <img id="avatar-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="margin-left: 16px; display: flex; flex-direction: column; justify-content: center;">
+                <span id="user-fullname" style="font-size: 18px; font-weight: 700; color: #ffffff;">Имя</span>
+                <span id="user-username" style="font-size: 14px; color: #8e8e93; margin-top: 2px;">@username</span>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш баланс:</span><span style="font-weight: 600;" id="prof-balance">0.00 ₽</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Взято подписей:</span><span style="font-weight: 600;" id="prof-signatures">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Успешных сделок:</span><span style="font-weight: 600;" id="prof-deals">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш реферальный процент:</span><span style="font-weight: 600; color: #007aff;" id="prof-ref-percent">5%</span></div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="color: #8e8e93;">Ваша реф. ссылка:</span>
+                <div style="display: flex; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; align-items: center; justify-content: space-between;">
+                    <span id="prof-ref-link" style="font-size: 13px; color: #aeaeae; word-break: break-all; padding-right: 8px;">https://t.me</span>
+                    <button onclick="copyRefLink()" style="background-color: #007aff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Копировать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="nav-bar">
+        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
+        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')"><span class="nav-icon">💬</span><span class="nav-label">чаты</span></button>
+        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
+        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
+    </div>
     <script>
         const tg = window.Telegram.WebApp;
         
@@ -6,29 +111,24 @@
                 tg.ready();
                 tg.expand();
                 
-                // Создаем переменные по умолчанию
                 let userId = "0";
                 let firstName = "Пользователь";
                 let username = "tg_user";
                 
-                // Проверяем, прислал ли бот данные через надежный параметр startapp
                 let startParam = tg.initDataUnsafe?.start_param;
                 
                 if (startParam && startParam.includes("___")) {
-                    // Разбиваем строку параметров обратно на ID, Имя и Юзернейм
                     let parts = startParam.split("___");
                     userId = parts[0];
                     firstName = decodeURIComponent(parts[1]);
                     username = decodeURIComponent(parts[2]);
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    // Резервный стандартный метод Telegram
                     const user = tg.initDataUnsafe.user;
                     userId = user.id;
                     firstName = user.first_name;
                     username = user.username || "user";
                 }
                 
-                // Выводим готовые данные на экран (Заменяем "Загрузка..." и "Имя")
                 document.getElementById('user-greeting-top').innerText = `@${username}`;
                 document.getElementById('user-fullname').innerText = firstName;
                 document.getElementById('user-username').innerText = `@${username}`;
@@ -40,11 +140,16 @@
         }
         
         initWebApp();
+
         let isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
             document.getElementById('seller-status-block').style.display = "flex";
             document.getElementById('seller-actions').style.display = "block";
+        } else {
+            document.getElementById('role-title').innerText = "Покупатель";
+            document.getElementById('seller-status-block').style.display = "none";
+            document.getElementById('seller-actions').style.display = "none";
         }
 
         function toggleStatus() {
@@ -54,12 +159,10 @@
             else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
-        
         function openModal() {
             const form = document.getElementById('product-form');
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
-        
         function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
         
         function copyRefLink() {
