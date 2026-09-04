@@ -166,101 +166,107 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+       // Логика ролей (позже автоматизируем через бота)
+let isSeller = true; 
+if (isSeller) {
+    document.getElementById('role-title').innerText = "Продавец";
+    document.getElementById('seller-status-block').style.display = "flex";
+    document.getElementById('seller-actions').style.display = "block";
+} else {
+    document.getElementById('role-title').innerText = "Покупатель";
+    document.getElementById('seller-status-block').style.display = "none";
+    document.getElementById('seller-actions').style.display = "none";
+}
 
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            const usernameText = user.username ? `@${user.username}` : '';
-            const fullNameText = `${user.first_name} ${user.last_name || ''}`.trim();
-            
-            document.getElementById('user-greeting-top').innerText = usernameText || user.first_name;
-            document.getElementById('user-fullname').innerText = fullNameText;
-            document.getElementById('user-username').innerText = usernameText;
-            document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
-            
-            if (user.photo_url) {
-                document.getElementById('avatar-placeholder').style.display = 'none';
-                const img = document.getElementById('avatar-img');
-                img.src = user.photo_url;
-                img.style.display = 'block';
-            }
-        } else {
-            document.getElementById('user-greeting-top').innerText = "@test_user";
-            document.getElementById('user-fullname').innerText = "Тестовый Юзер";
-            document.getElementById('user-username').innerText = "@test_user";
-        }
+function toggleStatus() {
+    const isChecked = document.getElementById('status-toggle').checked;
+    const statusText = document.getElementById('status-text');
+    if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
+    else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
 
-        let isSeller = true; 
+function openModal() {
+    const form = document.getElementById('product-form');
+    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+}
 
-        if (isSeller) {
-            document.getElementById('role-title').innerText = "Продавец";
-            document.getElementById('seller-status-block').style.display = "flex";
-            document.getElementById('seller-actions').style.display = "block";
-        } else {
-            document.getElementById('role-title').innerText = "Покупатель";
-            document.getElementById('seller-status-block').style.display = "none";
-            document.getElementById('seller-actions').style.display = "none";
-        }
+function saveProduct() {
+    alert('Товар отправлен в сеть!');
+    document.getElementById('product-form').style.display = 'none';
+}
 
-        function toggleStatus() {
-            const isChecked = document.getElementById('status-toggle').checked;
-            const statusText = document.getElementById('status-text');
-            if (isChecked) {
-                statusText.innerText = "В СЕТИ";
-                statusText.style.color = "#007aff";
-            } else {
-                statusText.innerText = "ОФФЛАЙН";
-                statusText.style.color = "#8e8e93";
-            }
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
+function copyRefLink() {
+    const linkText = document.getElementById('prof-ref-link').innerText;
+    navigator.clipboard.writeText(linkText).then(() => {
+        if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
+    });
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
 
-        function openModal() {
-            const form = document.getElementById('product-form');
-            form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
-        }
+function switchTab(tabId) {
+    const contents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
+    const buttons = document.getElementsByClassName('nav-button');
+    for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+    const activeTab = document.getElementById(tabId);
+    if (activeTab) { activeTab.style.display = 'block'; }
+    let buttonId = 'btn-' + tabId.replace('tab-', '');
+    const targetButton = document.getElementById(buttonId);
+    if (targetButton) { targetButton.classList.add('active'); }
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
+// Логика ролей (позже автоматизируем через бота)
+let isSeller = true; 
+if (isSeller) {
+    document.getElementById('role-title').innerText = "Продавец";
+    document.getElementById('seller-status-block').style.display = "flex";
+    document.getElementById('seller-actions').style.display = "block";
+} else {
+    document.getElementById('role-title').innerText = "Покупатель";
+    document.getElementById('seller-status-block').style.display = "none";
+    document.getElementById('seller-actions').style.display = "none";
+}
 
-        function saveProduct() {
-            alert('Товар отправлен в общую сеть!');
-            document.getElementById('product-form').style.display = 'none';
-        }
+function toggleStatus() {
+    const isChecked = document.getElementById('status-toggle').checked;
+    const statusText = document.getElementById('status-text');
+    if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
+    else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
 
-        function copyRefLink() {
-            const linkText = document.getElementById('prof-ref-link').innerText;
-            navigator.clipboard.writeText(linkText).then(() => {
-                if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
-                else alert("Скопировано!");
-            });
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
+function openModal() {
+    const form = document.getElementById('product-form');
+    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+}
 
-        function changeAvatar() {
-            if (tg.showPopup) {
-                tg.showPopup({
-                    title: 'Аватар',
-                    message: 'Аватар подтягивается автоматически из Telegram.',
-                    buttons: [{type: 'close'}]
-                });
-            }
-        }
+function saveProduct() {
+    alert('Товар отправлен в сеть!');
+    document.getElementById('product-form').style.display = 'none';
+}
 
-        function switchTab(tabId) {
-            const contents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
+function copyRefLink() {
+    const linkText = document.getElementById('prof-ref-link').innerText;
+    navigator.clipboard.writeText(linkText).then(() => {
+        if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
+    });
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
 
-            const buttons = document.getElementsByClassName('nav-button');
-            for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+function switchTab(tabId) {
+    const contents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
+    const buttons = document.getElementsByClassName('nav-button');
+    for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+    const activeTab = document.getElementById(tabId);
+    if (activeTab) { activeTab.style.display = 'block'; }
+    let buttonId = 'btn-' + tabId.replace('tab-', '');
+    const targetButton = document.getElementById(buttonId);
+    if (targetButton) { targetButton.classList.add('active'); }
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+}
 
-            const activeTab = document.getElementById(tabId);
-            if (activeTab) { activeTab.style.display = 'block'; }
-
-            let buttonId = 'btn-' + tabId.replace('tab-', '');
-            const targetButton = document.getElementById(buttonId);
-            if (targetButton) { targetButton.classList.add('active'); }
-
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
     </script>
 </body>
