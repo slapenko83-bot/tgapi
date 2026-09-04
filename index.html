@@ -4,26 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Market</title>
+    <!-- Официальный скрипт Telegram (Обязательно в head) -->
     <script src="https://telegram.org"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            margin: 0;
-            padding: 16px 16px 120px 16px;
-            box-sizing: border-box;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #1c1c1e;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 16px 16px 120px 16px; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1c1c1e; }
         .user-info h1 { font-size: 20px; margin: 0; font-weight: 700; }
         .user-info p { font-size: 13px; color: #8e8e93; margin: 4px 0 0 0; }
         .status-container { display: none; align-items: center; gap: 8px; }
@@ -49,7 +34,6 @@
 </head>
 <body>
 
-    <!-- Шапка -->
     <div class="header-container">
         <div class="user-info">
             <h1 id="role-title">Покупатель</h1>
@@ -64,47 +48,29 @@
         </div>
     </div>
 
-    <!-- Экран 1: ПОДПИСИ -->
+    <!-- Вкладки экранов -->
     <div id="tab-signatures" class="tab-content" style="display: block;">
         <div id="seller-actions" style="display: none; margin-bottom: 20px;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
             <div id="product-form" class="card" style="display: none; border-color: #007aff;">
                 <h3>Новое объявление</h3>
-                <div class="form-group">
-                    <label>Название товара</label>
-                    <input type="text" id="prod-name" placeholder="Введите название">
-                </div>
-                <div class="form-group">
-                    <label>Описание</label>
-                    <textarea id="prod-desc" rows="3" placeholder="Укажите описание"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Цена (₽)</label>
-                    <input type="number" id="prod-price" placeholder="1000">
-                </div>
+                <div class="form-group"><label>Название товара</label><input type="text" id="prod-name"></div>
+                <div class="form-group"><label>Описание</label><textarea id="prod-desc" rows="3"></textarea></div>
+                <div class="form-group"><label>Цена (₽)</label><input type="number" id="prod-price"></div>
                 <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
             </div>
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #ffffff; font-size: 16px; font-weight: 500; margin: 0;">Нет активных продавцов</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #ffffff; font-size: 16px; font-weight: 500;">Нет активных продавцов</p></div>
     </div>
 
-    <!-- Экран 2: ЧАТЫ -->
     <div id="tab-chats" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #8e8e93; font-size: 16px; font-weight: 500; margin: 0;">У вас нет активных чатов</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">У вас нет активных чатов</p></div>
     </div>
 
-    <!-- Экран 3: СПОРЫ -->
     <div id="tab-disputes" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
-            <p style="color: #8e8e93; font-size: 16px; font-weight: 500; margin: 0;">Нет активных споров</p>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">Нет активных споров</p></div>
     </div>
 
-    <!-- Экран 4: ПРОФИЛЬ -->
     <div id="tab-profile" class="tab-content">
         <div style="display: flex; align-items: center; margin-bottom: 24px; padding: 10px 0;">
             <div onclick="changeAvatar()" style="width: 70px; height: 70px; border-radius: 50%; background-color: #2c2c2e; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #007aff; overflow: hidden; flex-shrink: 0;">
@@ -116,51 +82,27 @@
                 <span id="user-username" style="font-size: 14px; color: #8e8e93; margin-top: 2px;">@username</span>
             </div>
         </div>
-
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0; font-size: 15px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;">
-                <span style="color: #8e8e93;">Ваш баланс:</span>
-                <span style="font-weight: 600; color: #ffffff;" id="prof-balance">0.00 ₽</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;">
-                <span style="color: #8e8e93;">Взято подписей:</span>
-                <span style="font-weight: 600; color: #ffffff;" id="prof-signatures">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;">
-                <span style="color: #8e8e93;">Успешных сделок:</span>
-                <span style="font-weight: 600; color: #ffffff;" id="prof-deals">0</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;">
-                <span style="color: #8e8e93;">Ваш реферальный процент:</span>
-                <span style="font-weight: 600; color: #007aff;" id="prof-ref-percent">5%</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 4px;">
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш баланс:</span><span style="font-weight: 600;" id="prof-balance">0.00 ₽</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Взято подписей:</span><span style="font-weight: 600;" id="prof-signatures">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Успешных сделок:</span><span style="font-weight: 600;" id="prof-deals">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш реферальный процент:</span><span style="font-weight: 600; color: #007aff;" id="prof-ref-percent">5%</span></div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
                 <span style="color: #8e8e93;">Ваша реф. ссылка:</span>
                 <div style="display: flex; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; align-items: center; justify-content: space-between;">
                     <span id="prof-ref-link" style="font-size: 13px; color: #aeaeae; word-break: break-all; padding-right: 8px;">https://t.me</span>
-                    <button onclick="copyRefLink()" style="background-color: #007aff; color: #ffffff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; flex-shrink: 0;">Копировать</button>
+                    <button onclick="copyRefLink()" style="background-color: #007aff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Копировать</button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Навигация -->
     <div class="nav-bar">
-        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')">
-            <span class="nav-icon">✍️</span>
-            <span class="nav-label">подписи</span>
-        </button>
-        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')">
-            <span class="nav-icon">💬</span>
-            <span class="nav-label">чаты</span>
-        </button>
-        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')">
-            <span class="nav-icon">⚖️</span>
-            <span class="nav-label">споры</span>
-        </button>
-        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">профиль</span>
-        </button>
+        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
+        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')"><span class="nav-icon">💬</span><span class="nav-label">чаты</span></button>
+        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
+        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
 
     <script>
@@ -168,36 +110,21 @@
         tg.ready();
         tg.expand();
 
-        // Главная функция получения и отрисовки данных
         function initWebApp() {
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 const usernameText = user.username ? `@${user.username}` : '';
-                
-                // Отображаем данные на экране
                 document.getElementById('user-greeting-top').innerText = usernameText || user.first_name;
                 document.getElementById('user-fullname').innerText = user.first_name;
                 document.getElementById('user-username').innerText = usernameText || `ID: ${user.id}`;
-                
-                // Ставим ваш точный юзернейм бота со скриншота
-                document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
-                
+                document.getElementById('prof-ref-link').innerText = `https://t.me?start=ref_${user.id}`;
                 if (user.photo_url) {
                     document.getElementById('avatar-placeholder').style.display = 'none';
                     const img = document.getElementById('avatar-img');
-                    img.src = user.photo_url;
-                    img.style.display = 'block';
+                    img.src = user.photo_url; img.style.display = 'block';
                 }
-            } else {
-                // Если открыли просто в браузере
-                document.getElementById('user-greeting-top').innerText = "@guest";
-                document.getElementById('user-fullname').innerText = "Гость";
-                document.getElementById('user-username').innerText = "@guest";
-                document.getElementById('prof-ref-link').innerText = "https://t.me";
             }
         }
-
-        // Запускаем сбор данных сразу при старте
         initWebApp();
 
         let isSeller = true; 
@@ -218,52 +145,28 @@
             else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
-
         function openModal() {
             const form = document.getElementById('product-form');
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
-
-        function saveProduct() {
-            alert('Товар отправлен в общую сеть!');
-            document.getElementById('product-form').style.display = 'none';
-        }
-
+        function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
         function copyRefLink() {
-            const linkText = document.getElementById('prof-ref-link').innerText;
-            navigator.clipboard.writeText(linkText).then(() => {
-                if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
-            });
+            navigator.clipboard.writeText(document.getElementById('prof-ref-link').innerText).then(() => { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
-
-        function changeAvatar() {
-            if (tg.showPopup) {
-                tg.showPopup({
-                    title: 'Аватар',
-                    message: 'Аватар подтягивается автоматически из Telegram.',
-                    buttons: [{type: 'close'}]
-                });
-            }
-        }
-
+        function changeAvatar() { if (tg.showPopup) tg.showPopup({ title: 'Аватар', message: 'Синхронизируется с Telegram.', buttons: [{type: 'close'}] }); }
+        
         function switchTab(tabId) {
             const contents = document.getElementsByClassName('tab-content');
             for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
-
             const buttons = document.getElementsByClassName('nav-button');
             for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
-
             const activeTab = document.getElementById(tabId);
             if (activeTab) { activeTab.style.display = 'block'; }
-
-            let buttonId = 'btn-' + tabId.replace('tab-', '');
-            const targetButton = document.getElementById(buttonId);
+            const targetButton = document.getElementById('btn-' + tabId.replace('tab-', ''));
             if (targetButton) { targetButton.classList.add('active'); }
-
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
     </script>
 </body>
 </html>
-
