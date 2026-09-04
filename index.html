@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- КРИТИЧЕСКИ ВАЖНО: Разрешаем скриптам Telegram работать без блокировки CORS -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Market</title>
-    <!-- Официальный скрипт Telegram -->
+    <!-- Официальный скрипт Telegram WebApp -->
     <script src="https://telegram.org"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 16px 16px 120px 16px; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
@@ -96,7 +98,6 @@
             </div>
         </div>
     </div>
-
     <!-- Навигация -->
     <div class="nav-bar">
         <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
@@ -104,49 +105,79 @@
         <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
-            <script>
+
+    <script>
         var tg = window.Telegram.WebApp;
-        
-        function initWebApp() {
+        tg.ready();
+        tg.expand();
+
+        document.addEventListener("DOMContentLoaded", function() {
+            initWebAppForce();
+        });
+
+        function initWebAppForce() {
             try {
-                tg.ready();
-                tg.expand();
-                
-                // Самый надежный, стандартный метод Telegram без разбора строк
-                var user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : null;
-                
-                var userId = user ? user.id : "0";
-                var firstName = user ? user.first_name : "Пользователь";
-                var username = user && user.username ? user.username : "tg_user";
-                
-                // Выводим данные на экраны
+                var userId = "0";
+                var firstName = "Пользователь";
+                var username = "tg_user";
+
+                var webAppUser = null;
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    webAppUser = tg.initDataUnsafe.user;
+                } else if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                    webAppUser = window.Telegram.WebApp.initDataUnsafe.user;
+                }
+
+                if (webAppUser) {
+                    userId = webAppUser.id ? webAppUser.id.toString() : "0";
+                    firstName = webAppUser.first_name || "Пользователь";
+                    username = webAppUser.username || "user";
+                } else {
+                    var searchParams = new URLSearchParams(window.location.search);
+                    var tgWebAppData = searchParams.get("tgWebAppData") || window.location.hash;
+                    
+                    if (tgWebAppData) {
+                        var decodedData = decodeURIComponent(tgWebAppData);
+                        var userMatch = decodedData.match(/"user"\s*:\s*({[^}]+})/);
+                        if (userMatch && userMatch[1]) {
+                            try {
+                                var parsedUser = JSON.parse(userMatch[1]);
+                                userId = parsedUser.id ? parsedUser.id.toString() : "0";
+                                firstName = parsedUser.first_name || "Пользователь";
+                                username = parsedUser.username || "user";
+                            } catch(e) {}
+                        }
+                    }
+                }
+
                 document.getElementById('user-greeting-top').innerText = "@" + username;
                 document.getElementById('user-fullname').innerText = firstName;
                 document.getElementById('user-username').innerText = "@" + username;
                 document.getElementById('prof-ref-link').innerText = "https://t.me_" + userId;
-                
+
+                if (webAppUser && webAppUser.photo_url) {
+                    document.getElementById('avatar-placeholder').style.display = 'none';
+                    var img = document.getElementById('avatar-img');
+                    img.src = webAppUser.photo_url; 
+                    img.style.display = 'block';
+                }
             } catch (err) {
-                document.getElementById('user-greeting-top').innerText = "@market_user";
+                document.getElementById('user-greeting-top').innerText = "@error_init";
             }
         }
-        
-        initWebApp();
+
         var isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
             document.getElementById('seller-status-block').style.display = "flex";
             document.getElementById('seller-actions').style.display = "block";
-        } else {
-            document.getElementById('role-title').innerText = "Покупатель";
-            document.getElementById('seller-status-block').style.display = "none";
-            document.getElementById('seller-actions').style.display = "none";
         }
 
         function toggleStatus() {
             var isChecked = document.getElementById('status-toggle').checked;
             var statusText = document.getElementById('status-text');
             if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
-            else { statusText.innerText = "ОФФЛАЙ延"; statusText.style.color = "#8e8e93"; }
+            else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         function openModal() {
@@ -177,4 +208,3 @@
     </script>
 </body>
 </html>
-
