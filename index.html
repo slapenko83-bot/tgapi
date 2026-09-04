@@ -180,31 +180,89 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        const user = tg.initDataUnsafe.user;
+        const tgUser = tg.initDataUnsafe.user;
 
-        if (user) {
-            // Полное имя (никнейм) - сверху
+        // ===== ЗАГРУЗКА ДАННЫХ ЧЕРЕЗ API =====
+        async function loadUserData() {
+            if (!tgUser) return;
+
+            try {
+                // Делаем запрос к нашему Python API
+                const response = await fetch('http://localhost:5000/api/user/' + tgUser.id);
+                const data = await response.json();
+
+                if (data.success) {
+                    const apiUser = data.user;
+                    const stats = data.stats;
+
+                    // Полное имя
+                    const fullNameEl = document.getElementById('userFullName');
+                    if (apiUser.full_name) {
+                        fullNameEl.textContent = apiUser.full_name;
+                    } else if (apiUser.username) {
+                        fullNameEl.textContent = '@' + apiUser.username;
+                    } else {
+                        fullNameEl.textContent = 'Пользователь';
+                    }
+
+                    // @username
+                    const usernameEl = document.getElementById('userUsername');
+                    if (apiUser.username) {
+                        usernameEl.textContent = '@' + apiUser.username;
+                    } else {
+                        usernameEl.textContent = 'username не указан';
+                    }
+
+                    // Аватарка (приоритет: из API, fallback: Telegram)
+                    const avatarEl = document.getElementById('userAvatar');
+                    if (apiUser.photo_url) {
+                        avatarEl.src = apiUser.photo_url;
+                    } else {
+                        avatarEl.src = 'https://t.me/i/user_' + tgUser.id + '.jpg';
+                    }
+
+                    // Статистика из БД
+                    document.getElementById('statBalance').textContent = stats.balance.toFixed(2) + ' ₽';
+                    document.getElementById('statRefPercent').textContent = stats.ref_percent + '%';
+                    document.getElementById('statRefLink').textContent = stats.ref_link.replace('https://', '');
+                } else {
+                    // Если API не ответил, используем данные из Telegram напрямую
+                    useFallbackData();
+                }
+            } catch (error) {
+                console.log('Ошибка API, используем fallback:', error);
+                useFallbackData();
+            }
+        }
+
+        // FALLBACK: данные только из Telegram
+        function useFallbackData() {
+            if (!tgUser) return;
+            
             const fullNameEl = document.getElementById('userFullName');
-            let fullName = user.first_name || '';
-            if (user.last_name) fullName += ' ' + user.last_name;
+            let fullName = tgUser.first_name || '';
+            if (tgUser.last_name) fullName += ' ' + tgUser.last_name;
             fullNameEl.textContent = fullName || 'Пользователь';
 
-            // @username - снизу маленьким
             const usernameEl = document.getElementById('userUsername');
-            if (user.username) {
-                usernameEl.textContent = '@' + user.username;
+            if (tgUser.username) {
+                usernameEl.textContent = '@' + tgUser.username;
             } else {
                 usernameEl.textContent = 'username не указан';
             }
 
-            // Аватарка
             const avatarEl = document.getElementById('userAvatar');
-            avatarEl.src = 'https://t.me/i/user_' + user.id + '.jpg';
+            avatarEl.src = 'https://t.me/i/user_' + tgUser.id + '.jpg';
 
-            // Реф. ссылка
-            const refLinkEl = document.getElementById('statRefLink');
-            refLinkEl.textContent = 't.me/testkurgan_bot?start=ref_' + user.id;
+            document.getElementById('statRefLink').textContent = 
+                't.me/testkurgan_bot?start=ref_' + tgUser.id;
         }
+
+        // Пока сразу показываем данные из Telegram (мгновенно)
+        useFallbackData();
+        
+        // Затем пытаемся обновить через API (с аватаркой и статистикой)
+        loadUserData();
 
         // ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ
         function switchTab(tabName) {
