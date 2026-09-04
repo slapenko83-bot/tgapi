@@ -11,13 +11,11 @@
             background-color: #000000;
             color: #ffffff;
             margin: 0;
-            padding: 16px 16px 90px 16px;
+            padding: 16px 16px 100px 16px;
             box-sizing: border-box;
             -webkit-user-select: none;
             user-select: none;
         }
-
-        /* Шапка с тумблером статуса для продавцов */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -26,154 +24,40 @@
             padding-bottom: 12px;
             border-bottom: 1px solid #1c1c1e;
         }
-        .user-info h1 {
-            font-size: 20px;
-            margin: 0;
-            font-weight: 700;
-        }
-        .user-info p {
-            font-size: 13px;
-            color: #8e8e93;
-            margin: 4px 0 0 0;
-        }
-
-        /* Компактный тумблер (Toggle Switch) */
-        .status-container {
-            display: none; /* Включится через JS, если зашел Продавец */
-            align-items: center;
-            gap: 8px;
-        }
-        .status-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #8e8e93;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 46px;
-            height: 26px;
-        }
+        .user-info h1 { font-size: 20px; margin: 0; font-weight: 700; }
+        .user-info p { font-size: 13px; color: #8e8e93; margin: 4px 0 0 0; }
+        .status-container { display: none; align-items: center; gap: 8px; }
+        .status-label { font-size: 12px; font-weight: 600; color: #8e8e93; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #2c2c2e;
-            transition: .3s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; width: 20px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2c2c2e; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: #007aff; }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        /* Контент вкладок */
-        .tab-content { 
-            display: none; 
-        }
-        .tab-content.active { 
-            display: block !important; 
-        }
-
-        .card {
-            background-color: #1c1c1e;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #2c2c2e;
-        }
+        .tab-content { display: none; }
+        .card { background-color: #1c1c1e; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #2c2c2e; }
         .card h3 { margin: 0 0 6px 0; font-size: 16px; color: #007aff; }
         .card p { margin: 0; font-size: 13px; color: #aeaeae; line-height: 1.4; }
-
-        /* Форма создания товара (Кнопка Продажа) */
-        .btn-primary {
-            background-color: #007aff;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            width: 100%;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 16px;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: #8e8e93;
-            margin-bottom: 4px;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            background-color: #1c1c1e;
-            border: 1px solid #2c2c2e;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        /* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1c1c1e;
-            border-top: 1px solid #2c2c2e;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-            box-sizing: border-box;
-            z-index: 99999;
-        }
-
-        .nav-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            color: #8e8e93;
-            cursor: pointer;
-            width: 23%;
-            height: 44px;
-            padding: 0;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        .btn-primary { background-color: #007aff; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #8e8e93; margin-bottom: 4px; }
+        .form-group input, .form-group textarea { width: 100%; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; color: white; box-sizing: border-box; font-family: inherit; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #1c1c1e; border-top: 1px solid #2c2c2e; display: flex; justify-content: space-around; align-items: center; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); box-sizing: border-box; z-index: 99999; }
+        .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: #8e8e93; cursor: pointer; width: 23%; height: 44px; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         .nav-icon { font-size: 16px; margin-bottom: 2px; pointer-events: none; }
         .nav-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; pointer-events: none; }
-
-        /* Активная синяя кнопка */
         .nav-button.active { color: #007aff !important; }
     </style>
 </head>
 <body>
 
-    <!-- Единая шапка -->
+    <!-- Шапка -->
     <div class="header-container">
         <div class="user-info">
             <h1 id="role-title">Покупатель</h1>
-            <p id="user-greeting">@username</p>
+            <p id="user-greeting">Загрузка...</p>
         </div>
-        <!-- Тумблер для продавцов -->
+        <!-- Тумблер онлайн-статуса -->
         <div class="status-container" id="seller-status-block">
             <span class="status-label" id="status-text">ОФФЛАЙН</span>
             <label class="switch">
@@ -183,37 +67,34 @@
         </div>
     </div>
 
-    <!-- Вкладка 1: ПОДПИСИ -->
-    <div id="tab-signatures" class="tab-content active">
-        <!-- Блок добавления товара для продавцов -->
+    <!-- Экран 1: ПОДПИСИ -->
+    <div id="tab-signatures" class="tab-content" style="display: block;">
         <div id="seller-actions" style="display: none;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
-            
             <div id="product-form" class="card" style="display: none; border-color: #007aff;">
                 <h3>Новое объявление</h3>
                 <div class="form-group">
                     <label>Название товара</label>
-                    <input type="text" id="prod-name" placeholder="Например: Telegram Premium 1 год">
+                    <input type="text" id="prod-name" placeholder="Введите название">
                 </div>
                 <div class="form-group">
                     <label>Описание</label>
-                    <textarea id="prod-desc" rows="3" placeholder="Укажите ваши условия..."></textarea>
+                    <textarea id="prod-desc" rows="3" placeholder="Укажите описание"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Цена (₽)</label>
-                    <input type="number" id="prod-price" placeholder="1500">
+                    <input type="number" id="prod-price" placeholder="1000">
                 </div>
                 <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
             </div>
         </div>
-
         <div class="card">
             <h3>🔏 Мои подписи</h3>
             <p>Здесь находятся ваши цифровые подписи для автоматического подтверждения сделок.</p>
         </div>
     </div>
 
-    <!-- Вкладка 2: ЧАТЫ -->
+    <!-- Экран 2: ЧАТЫ -->
     <div id="tab-chats" class="tab-content">
         <div class="card">
             <h3>💬 Ваши диалоги</h3>
@@ -221,7 +102,7 @@
         </div>
     </div>
 
-    <!-- Вкладка 3: СПОРЫ -->
+    <!-- Экран 3: СПОРЫ -->
     <div id="tab-disputes" class="tab-content">
         <div class="card">
             <h3>⚖️ Открытые апелляции</h3>
@@ -229,7 +110,7 @@
         </div>
     </div>
 
-    <!-- Вкладка 4: ПРОФИЛЬ -->
+    <!-- Экран 4: ПРОФИЛЬ -->
     <div id="tab-profile" class="tab-content">
         <div class="card">
             <h3>👤 Торговый профиль</h3>
@@ -237,7 +118,7 @@
         </div>
     </div>
 
-    <!-- Компактная нижняя панель вдоль всего экрана -->
+    <!-- Нижняя панель навигации -->
     <div class="nav-bar">
         <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')">
             <span class="nav-icon">✍️</span>
@@ -264,10 +145,11 @@
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('user-greeting').innerText = `@${tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name}`;
+        } else {
+            document.getElementById('user-greeting').innerText = "@test_user";
         }
 
-        // --- ТЕСТОВЫЙ РЕЖИМ РОЛИ ---
-        // Если true — включит интерфейс Продавца, если false — просто Покупатель
+        // РЕЖИМ РОЛИ (Пока вручную для теста интерфейса)
         let isSeller = true; 
 
         if (isSeller) {
@@ -280,9 +162,53 @@
             document.getElementById('seller-actions').style.display = "none";
         }
 
-        // Функция работы тумблера "В сети"
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
             const statusText = document.getElementById('status-text');
-            
-if (isChecked) {statusText.innerText = "В СЕТИ";statusText.style.color = "#007aff";} else {statusText.innerText = "ОФФЛАЙН";statusText.style.color = "#8e8e93";}if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');}// Показ формы создания товараfunction openModal() {const form = document.getElementById('product-form');form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';}function saveProduct() {alert('Товар отправлен в общую сеть!');document.getElementById('product-form').style.display = 'none';}// Переработанная функция переключения вкладокfunction switchTab(tabId) {// 1. Скрываем вообще все вкладкиconst contents = document.getElementsByClassName('tab-content');for (let i = 0; i < contents.length; i++) {contents[i].classList.remove('active');contents[i].style.display = 'none';}// 2. Убираем класс active у всех кнопок панелиconst buttons = document.getElementsByClassName('nav-button');for (let i = 0; i < buttons.length; i++) {buttons[i].classList.remove('active');}// 3. Показываем нужную вкладкуconst activeTab = document.getElementById(tabId);if (activeTab) {activeTab.classList.add('active');activeTab.style.display = 'block';}// 4. Подсвечиваем синим нажатую кнопкуlet buttonId = 'btn-' + tabId.replace('tab-', '');const targetButton = document.getElementById(buttonId);if (targetButton) {targetButton.classList.add('active');}if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');}
+            if (isChecked) {
+                statusText.innerText = "В СЕТИ";
+                statusText.style.color = "#007aff";
+            } else {
+                statusText.innerText = "ОФФЛАЙН";
+                statusText.style.color = "#8e8e93";
+            }
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function openModal() {
+            const form = document.getElementById('product-form');
+            form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+        }
+
+        function saveProduct() {
+            alert('Товар отправлен в общую сеть!');
+            document.getElementById('product-form').style.display = 'none';
+        }
+
+        function switchTab(tabId) {
+            const contents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].style.display = 'none';
+            }
+
+            const buttons = document.getElementsByClassName('nav-button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+
+            const activeTab = document.getElementById(tabId);
+            if (activeTab) {
+                activeTab.style.display = 'block';
+            }
+
+            let buttonId = 'btn-' + tabId.replace('tab-', '');
+            const targetButton = document.getElementById(buttonId);
+            if (targetButton) {
+                targetButton.classList.add('active');
+            }
+
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+    </script>
+</body>
+</html>
