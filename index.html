@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>P2P Market</title>
+    <title>Market</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -11,7 +11,7 @@
             background-color: #000000;
             color: #ffffff;
             margin: 0;
-            padding: 16px 16px 90px 16px; /* Отступ под компактное меню */
+            padding: 16px 16px 90px 16px;
             box-sizing: border-box;
             -webkit-user-select: none;
             user-select: none;
@@ -37,9 +37,9 @@
             margin: 4px 0 0 0;
         }
 
-        /* Стильный компактный тумблер (Toggle Switch) */
+        /* Компактный тумблер (Toggle Switch) */
         .status-container {
-            display: none; /* Показывается только если пользователь — продавец */
+            display: none; /* Включится через JS, если зашел Продавец */
             align-items: center;
             gap: 8px;
         }
@@ -72,12 +72,16 @@
             transition: .3s;
             border-radius: 50%;
         }
-        input:checked + .slider { background-color: #007aff; } /* Синий статус 'В сети' */
+        input:checked + .slider { background-color: #007aff; }
         input:checked + .slider:before { transform: translateX(20px); }
 
         /* Контент вкладок */
-        .tab-content { display: none; animation: fadeIn 0.2s ease-in-out; }
-        .tab-content.active { display: block; }
+        .tab-content { 
+            display: none; 
+        }
+        .tab-content.active { 
+            display: block !important; 
+        }
 
         .card {
             background-color: #1c1c1e;
@@ -86,7 +90,7 @@
             margin-bottom: 12px;
             border: 1px solid #2c2c2e;
         }
-        .card h3 { margin: 0 0 6px 0; font-size: 16px; color: #007aff; } /* Синий акцент */
+        .card h3 { margin: 0 0 6px 0; font-size: 16px; color: #007aff; }
         .card p { margin: 0; font-size: 13px; color: #aeaeae; line-height: 1.4; }
 
         /* Форма создания товара (Кнопка Продажа) */
@@ -122,7 +126,7 @@
             font-family: inherit;
         }
 
-        /* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (Вдоль всего низа, компактная) */
+        /* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -133,9 +137,9 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 6px 0 max(6px, env(safe-area-inset-bottom)); /* Поддержка челок iPhone */
+            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
             box-sizing: border-box;
-            z-index: 9999;
+            z-index: 99999;
         }
 
         .nav-button {
@@ -143,26 +147,22 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: none;
+            background: transparent;
             border: none;
             color: #8e8e93;
             cursor: pointer;
-            width: 60px;
-            height: 48px;
+            width: 23%;
+            height: 44px;
             padding: 0;
-            transition: color 0.15s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .nav-icon { font-size: 16px; margin-bottom: 3px; }
-        .nav-label { font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2px; }
+        .nav-icon { font-size: 16px; margin-bottom: 2px; pointer-events: none; }
+        .nav-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; pointer-events: none; }
 
         /* Активная синяя кнопка */
-        .nav-button.active { color: #007aff; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(2px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .nav-button.active { color: #007aff !important; }
     </style>
 </head>
 <body>
@@ -170,10 +170,10 @@
     <!-- Единая шапка -->
     <div class="header-container">
         <div class="user-info">
-            <h1 id="role-title">P2P Покупатель</h1>
+            <h1 id="role-title">Покупатель</h1>
             <p id="user-greeting">@username</p>
         </div>
-        <!-- Тумблер для продавцов (по умолчанию скрыт, включим через JS) -->
+        <!-- Тумблер для продавцов -->
         <div class="status-container" id="seller-status-block">
             <span class="status-label" id="status-text">ОФФЛАЙН</span>
             <label class="switch">
@@ -185,11 +185,10 @@
 
     <!-- Вкладка 1: ПОДПИСИ -->
     <div id="tab-signatures" class="tab-content active">
-        <!-- Блок добавления товара для ПРОДАВЦОВ (скрыт для покупателей) -->
+        <!-- Блок добавления товара для продавцов -->
         <div id="seller-actions" style="display: none;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
             
-            <!-- Форма добавления (пока простая, прямо в ленте) -->
             <div id="product-form" class="card" style="display: none; border-color: #007aff;">
                 <h3>Новое объявление</h3>
                 <div class="form-group">
@@ -198,7 +197,7 @@
                 </div>
                 <div class="form-group">
                     <label>Описание</label>
-                    <textarea id="prod-desc" rows="3" placeholder="Укажите условия, регион активации..."></textarea>
+                    <textarea id="prod-desc" rows="3" placeholder="Укажите ваши условия..."></textarea>
                 </div>
                 <div class="form-group">
                     <label>Цена (₽)</label>
@@ -210,7 +209,7 @@
 
         <div class="card">
             <h3>🔏 Мои подписи</h3>
-            <p>Здесь находятся ваши цифровые подписи для автоматического подтверждения депонирования сделок.</p>
+            <p>Здесь находятся ваши цифровые подписи для автоматического подтверждения сделок.</p>
         </div>
     </div>
 
@@ -240,19 +239,19 @@
 
     <!-- Компактная нижняя панель вдоль всего экрана -->
     <div class="nav-bar">
-        <button class="nav-button active" onclick="switchTab('tab-signatures', this)">
+        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')">
             <span class="nav-icon">✍️</span>
             <span class="nav-label">Подписи</span>
         </button>
-        <button class="nav-button" onclick="switchTab('tab-chats', this)">
+        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')">
             <span class="nav-icon">💬</span>
             <span class="nav-label">Чаты</span>
         </button>
-        <button class="nav-button" onclick="switchTab('tab-disputes', this)">
+        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')">
             <span class="nav-icon">⚖️</span>
             <span class="nav-label">Споры</span>
         </button>
-        <button class="nav-button" onclick="switchTab('tab-profile', this)">
+        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')">
             <span class="nav-icon">👤</span>
             <span class="nav-label">Профиль</span>
         </button>
@@ -263,21 +262,27 @@
         tg.ready();
         tg.expand();
 
-        // Настройка имени пользователя
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('user-greeting').innerText = `@${tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name}`;
         }
 
-        // --- ДЕМОНСТРАЦИЯ РОЛИ ПРОДАВЦА ---
-        // Имитируем, что этот пользователь зашел как Продавец (позже свяжем это с базой данных бота)
+        // --- ТЕСТОВЫЙ РЕЖИМ РОЛИ ---
+        // Если true — включит интерфейс Продавца, если false — просто Покупатель
         let isSeller = true; 
 
         if (isSeller) {
-            document.getElementById('role-title').innerText = "P2P Продавец";
+            document.getElementById('role-title').innerText = "Продавец";
             document.getElementById('seller-status-block').style.display = "flex";
             document.getElementById('seller-actions').style.display = "block";
+        } else {
+            document.getElementById('role-title').innerText = "Покупатель";
+            document.getElementById('seller-status-block').style.display = "none";
+            document.getElementById('seller-actions').style.display = "none";
         }
 
         // Функция работы тумблера "В сети"
         function toggleStatus() {
-const isChecked = document.getElementById('status-toggle').checked;const statusText = document.getElementById('status-text');if (isChecked) {statusText.innerText = "В СЕТИ";statusText.style.color = "#007aff";// Здесь будет отправка запроса боту: "Продавец зашел в сеть"} else {statusText.innerText = "ОФФЛАЙН";statusText.style.color = "#8e8e93";// Здесь будет отправка запроса боту: "Продавец ушел в оффлайн"}if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');}// Показ формы создания товараfunction openModal() {const form = document.getElementById('product-form');form.style.display = form.style.display === 'none' ? 'block' : 'none';}// Имитация сохранения товараfunction saveProduct() {alert('Товар отправлен на модерацию в общую сеть!');document.getElementById('product-form').style.display = 'none';}// Переключение вкладок менюfunction switchTab(tabId, buttonElement) {document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));document.getElementById(tabId).classList.add('active');buttonElement.classList.add('active');if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');}
+            const isChecked = document.getElementById('status-toggle').checked;
+            const statusText = document.getElementById('status-text');
+            
+if (isChecked) {statusText.innerText = "В СЕТИ";statusText.style.color = "#007aff";} else {statusText.innerText = "ОФФЛАЙН";statusText.style.color = "#8e8e93";}if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');}// Показ формы создания товараfunction openModal() {const form = document.getElementById('product-form');form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';}function saveProduct() {alert('Товар отправлен в общую сеть!');document.getElementById('product-form').style.display = 'none';}// Переработанная функция переключения вкладокfunction switchTab(tabId) {// 1. Скрываем вообще все вкладкиconst contents = document.getElementsByClassName('tab-content');for (let i = 0; i < contents.length; i++) {contents[i].classList.remove('active');contents[i].style.display = 'none';}// 2. Убираем класс active у всех кнопок панелиconst buttons = document.getElementsByClassName('nav-button');for (let i = 0; i < buttons.length; i++) {buttons[i].classList.remove('active');}// 3. Показываем нужную вкладкуconst activeTab = document.getElementById(tabId);if (activeTab) {activeTab.classList.add('active');activeTab.style.display = 'block';}// 4. Подсвечиваем синим нажатую кнопкуlet buttonId = 'btn-' + tabId.replace('tab-', '');const targetButton = document.getElementById(buttonId);if (targetButton) {targetButton.classList.add('active');}if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');}
