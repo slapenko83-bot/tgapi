@@ -50,7 +50,6 @@
     </style>
 </head>
 <body>
-<body>
 
     <!-- Шапка -->
     <div class="header-container">
@@ -70,7 +69,8 @@
 
     <!-- Экран 1: ПОДПИСИ -->
     <div id="tab-signatures" class="tab-content" style="display: block;">
-        <div id="seller-actions" style="display: none;">
+        <!-- Кнопка добавления товара для продавцов (оставляем сверху, если включен режим продавца) -->
+        <div id="seller-actions" style="display: none; margin-bottom: 20px;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
             <div id="product-form" class="card" style="display: none; border-color: #007aff;">
                 <h3>Новое объявление</h3>
@@ -89,35 +89,28 @@
                 <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
             </div>
         </div>
-        <div class="card">
-            <h3>🔏 Мои подписи</h3>
-            <p>Здесь находятся ваши цифровые подписи для автоматического подтверждения сделок.</p>
+        
+        <!-- Белый текст строго по центру экрана -->
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
+            <p style="color: #ffffff; font-size: 16px; font-weight: 500; margin: 0;">Нет активных продавцов</p>
         </div>
     </div>
 
     <!-- Экран 2: ЧАТЫ -->
     <div id="tab-chats" class="tab-content">
-        <div class="card">
-            <h3>💬 Активные чаты с продавцами</h3>
-            <!-- Сюда JS автоматически вставит список чатов или надпись об их отсутствии -->
-            <div id="chats-container"></div>
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;">
+            <p style="color: #8e8e93; font-size: 16px; font-weight: 500; margin: 0;">У вас нет активных чатов</p>
         </div>
     </div>
 
     <!-- Экран 3: СПОРЫ -->
     <div id="tab-disputes" class="tab-content">
-        <div class="card">
-            <h3>⚖️ Открытые апелляции</h3>
-            <p>Диспуты по транзакциям, ожидающие подключения независимого арбитра.</p>
-        </div>
+        <!-- Чистый экран без плашек, готовый под будущую логику -->
     </div>
 
     <!-- Экран 4: ПРОФИЛЬ -->
     <div id="tab-profile" class="tab-content">
-        <div class="card">
-            <h3>👤 Торговый профиль</h3>
-            <p>История операций, внутренняя репутация аккаунта и ваши платежные реквизиты.</p>
-        </div>
+        <!-- Чистый экран без плашек, готовый под будущую логику -->
     </div>
 
     <!-- Нижняя панель навигации -->
@@ -151,7 +144,7 @@
             document.getElementById('user-greeting').innerText = "@test_user";
         }
 
-        // РЕЖИМ РОЛИ (Пока вручную для теста интерфейса)
+        // РЕЖИМ РОЛИ (Поменяйте на false, чтобы увидеть чистый экран Покупателя)
         let isSeller = true; 
 
         if (isSeller) {
@@ -163,31 +156,6 @@
             document.getElementById('seller-status-block').style.display = "none";
             document.getElementById('seller-actions').style.display = "none";
         }
-
-        // --- ЛОГИКА ОТОБРАЖЕНИЯ ЧАТОВ ---
-        // Массив с активными чатами (сейчас он пустой для теста условия)
-        let activeChats = []; 
-
-        function renderChats() {
-            const container = document.getElementById('chats-container');
-            if (activeChats.length === 0) {
-                // Если чатов нет, выводим вашу фразу
-                container.innerHTML = `<p style="color: #8e8e93; margin: 10px 0 0 0;">У вас нет активных чатов</p>`;
-            } else {
-                // Если чаты появятся, они отобразятся списком ниже
-                container.innerHTML = "";
-                activeChats.forEach(chat => {
-                    container.innerHTML += `
-                        <div style="padding: 10px 0; border-bottom: 1px solid #2c2c2e; margin-top: 10px;">
-                            <span style="font-weight: bold; color: #007aff;">👤 Продавец: ${chat.seller}</span><br>
-                            <span style="font-size: 12px; color: #aeaeae;">Товар: ${chat.item}</span>
-                        </div>`;
-                });
-            }
-        }
-
-        // Вызываем отрисовку чатов при загрузке страницы
-        renderChats();
 
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
@@ -239,4 +207,5 @@
     </script>
 </body>
 </html>
+
 
