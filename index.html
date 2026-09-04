@@ -97,37 +97,39 @@
     </div>
 
     <!-- Навигация -->
-        <script>
-        const tg = window.Telegram.WebApp;
+            <script>
+        var tg = window.Telegram.WebApp;
         
         function initWebApp() {
             try {
                 tg.ready();
                 tg.expand();
                 
-                let userId = "0";
-                let firstName = "Пользователь";
-                let username = "tg_user";
+                var userId = "0";
+                var firstName = "Пользователь";
+                var username = "tg_user";
                 
-                let startParam = tg.initDataUnsafe?.start_param;
+                var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
                 
-                // Исправленный и безопасный блок чтения параметров
-                if (startParam && startParam.includes("___")) {
-                    let [pId, pName, pUname] = startParam.split("___");
-                    userId = pId || "0";
-                    firstName = pName ? decodeURIComponent(pName) : "Пользователь";
-                    username = pUname ? decodeURIComponent(pUname) : "tg_user";
+                // Классический и самый надежный способ разбора строки без деструктуризации
+                if (startParam && startParam.indexOf("___") !== -1) {
+                    var parts = startParam.split("___");
+                    if (parts.length >= 3) {
+                        userId = parts[0] || "0";
+                        firstName = parts[1] ? decodeURIComponent(parts[1]) : "Пользователь";
+                        username = parts[2] ? decodeURIComponent(parts[2]) : "tg_user";
+                    }
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const user = tg.initDataUnsafe.user;
+                    var user = tg.initDataUnsafe.user;
                     userId = user.id;
                     firstName = user.first_name;
                     username = user.username || "user";
                 }
                 
-                document.getElementById('user-greeting-top').innerText = `@${username}`;
+                document.getElementById('user-greeting-top').innerText = "@" + username;
                 document.getElementById('user-fullname').innerText = firstName;
-                document.getElementById('user-username').innerText = `@${username}`;
-                document.getElementById('prof-ref-link').innerText = `https://t.me{userId}`;
+                document.getElementById('user-username').innerText = "@" + username;
+                document.getElementById('prof-ref-link').innerText = "https://t.me_" + userId;
                 
             } catch (err) {
                 document.getElementById('user-greeting-top').innerText = "@market_user";
@@ -135,7 +137,7 @@
         }
         
         initWebApp();
-        let isSeller = true; 
+        var isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
             document.getElementById('seller-status-block').style.display = "flex";
@@ -147,35 +149,35 @@
         }
 
         function toggleStatus() {
-            const isChecked = document.getElementById('status-toggle').checked;
-            const statusText = document.getElementById('status-text');
+            var isChecked = document.getElementById('status-toggle').checked;
+            var statusText = document.getElementById('status-text');
             if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
             else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         function openModal() {
-            const form = document.getElementById('product-form');
+            var form = document.getElementById('product-form');
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
         function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
         
         function copyRefLink() {
-            const linkText = document.getElementById('prof-ref-link').innerText;
-            navigator.clipboard.writeText(linkText).then(() => { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
+            var linkText = document.getElementById('prof-ref-link').innerText;
+            navigator.clipboard.writeText(linkText).then(function() { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         
         function changeAvatar() { if (tg.showPopup) tg.showPopup({ title: 'Аватар', message: 'Синхронизируется с Telegram.', buttons: [{type: 'close'}] }); }
         
         function switchTab(tabId) {
-            const contents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
-            const buttons = document.getElementsByClassName('nav-button');
-            for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+            var contents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
+            var buttons = document.getElementsByClassName('nav-button');
+            for (var i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
             
-            const activeTab = document.getElementById(tabId);
+            var activeTab = document.getElementById(tabId);
             if (activeTab) { activeTab.style.display = 'block'; }
-            const targetButton = document.getElementById('btn-' + tabId.replace('tab-', ''));
+            var targetButton = document.getElementById('btn-' + tabId.replace('tab-', ''));
             if (targetButton) { targetButton.classList.add('active'); }
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
