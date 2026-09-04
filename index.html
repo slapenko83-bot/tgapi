@@ -97,13 +97,7 @@
     </div>
 
     <!-- Навигация -->
-    <div class="nav-bar">
-        <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
-        <button id="btn-chats" class="nav-button" onclick="switchTab('tab-chats')"><span class="nav-icon">💬</span><span class="nav-label">чаты</span></button>
-        <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
-        <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
-    </div>
-    <script>
+        <script>
         const tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -117,11 +111,12 @@
                 
                 let startParam = tg.initDataUnsafe?.start_param;
                 
+                // Исправленный и безопасный блок чтения параметров
                 if (startParam && startParam.includes("___")) {
-                    let parts = startParam.split("___");
-                    userId = parts[0];
-                    firstName = decodeURIComponent(parts[1]);
-                    username = decodeURIComponent(parts[2]);
+                    let [pId, pName, pUname] = startParam.split("___");
+                    userId = pId || "0";
+                    firstName = pName ? decodeURIComponent(pName) : "Пользователь";
+                    username = pUname ? decodeURIComponent(pUname) : "tg_user";
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     const user = tg.initDataUnsafe.user;
                     userId = user.id;
@@ -140,7 +135,6 @@
         }
         
         initWebApp();
-
         let isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
@@ -188,3 +182,5 @@
     </script>
 </body>
 </html>
+
+
