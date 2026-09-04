@@ -104,7 +104,7 @@
         <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
-    <script>
+        <script>
         var tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -118,14 +118,16 @@
                 
                 var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
                 
-                // Исправленный 100% стабильный разбор строки параметров
-                if (startParam && startParam.indexOf("id-") !== -1) {
-                    var items = startParam.split("-");
-                    for (var i = 0; i < items.length; i++) {
-                        if (items[i] === "id") userId = items[i+1];
-                        if (items[i] === "name") firstName = decodeURIComponent(items[i+1]);
-                        if (items[i] === "user") username = decodeURIComponent(items[i+1]);
-                    }
+                // Финальный, исправленный разбор без индексов i+1
+                if (startParam && startParam.indexOf("-name-") !== -1) {
+                    var partId = startParam.split("id-")[1];
+                    if (partId) userId = partId.split("-name-")[0];
+                    
+                    var partName = startParam.split("-name-")[1];
+                    if (partName) firstName = decodeURIComponent(partName.split("-user-")[0]);
+                    
+                    var partUser = startParam.split("-user-")[1];
+                    if (partUser) username = decodeURIComponent(partUser);
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     var user = tg.initDataUnsafe.user;
                     userId = user.id;
@@ -144,7 +146,6 @@
         }
         
         initWebApp();
-
         var isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
@@ -191,3 +192,4 @@
     </script>
 </body>
 </html>
+
