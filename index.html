@@ -97,7 +97,7 @@
     </div>
 
     <!-- Навигация -->
-            <script>
+                <script>
         var tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -111,14 +111,15 @@
                 
                 var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
                 
-                // Классический и самый надежный способ разбора строки без деструктуризации
-                if (startParam && startParam.indexOf("___") !== -1) {
-                    var parts = startParam.split("___");
-                    if (parts.length >= 3) {
-                        userId = parts[0] || "0";
-                        firstName = parts[1] ? decodeURIComponent(parts[1]) : "Пользователь";
-                        username = parts[2] ? decodeURIComponent(parts[2]) : "tg_user";
-                    }
+                // Чтение параметров через поиск подстроки (без массивов и индексов)
+                if (startParam && startParam.indexOf("-") !== -1) {
+                    var rawId = startParam.match(/id-([^-]+)/);
+                    var rawName = startParam.match(/name-([^-]+)/);
+                    var rawUser = startParam.match(/user-([^-]+)/);
+                    
+                    if (rawId) userId = rawId[1];
+                    if (rawName) firstName = decodeURIComponent(rawName[1]);
+                    if (rawUser) username = decodeURIComponent(rawUser[1]);
                 } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     var user = tg.initDataUnsafe.user;
                     userId = user.id;
@@ -166,7 +167,6 @@
             navigator.clipboard.writeText(linkText).then(function() { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
-        
         function changeAvatar() { if (tg.showPopup) tg.showPopup({ title: 'Аватар', message: 'Синхронизируется с Telegram.', buttons: [{type: 'close'}] }); }
         
         function switchTab(tabId) {
@@ -184,5 +184,6 @@
     </script>
 </body>
 </html>
+
 
 
