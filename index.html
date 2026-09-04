@@ -34,12 +34,13 @@
 </head>
 <body>
 
+    <!-- Шапка -->
     <div class="header-container">
         <div class="user-info">
-            <h1 id="role-title">Покупатель</h1>
-            <p id="user-greeting-top">Загрузка...</p>
+            <h1 id="role-title">Продавец</h1>
+            <p id="user-greeting-top">@username</p>
         </div>
-        <div class="status-container" id="seller-status-block">
+        <div class="status-container" id="seller-status-block" style="display: flex;">
             <span class="status-label" id="status-text">ОФФЛАЙН</span>
             <label class="switch">
                 <input type="checkbox" id="status-toggle" onchange="toggleStatus()">
@@ -50,7 +51,7 @@
 
     <!-- Вкладки экранов -->
     <div id="tab-signatures" class="tab-content" style="display: block;">
-        <div id="seller-actions" style="display: none; margin-bottom: 20px;">
+        <div id="seller-actions" style="display: block; margin-bottom: 20px;">
             <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
             <div id="product-form" class="card" style="display: none; border-color: #007aff;">
                 <h3>Новое объявление</h3>
@@ -96,6 +97,7 @@
             </div>
         </div>
     </div>
+
     <!-- Навигация -->
     <div class="nav-bar">
         <button id="btn-signatures" class="nav-button active" onclick="switchTab('tab-signatures')"><span class="nav-icon">✍️</span><span class="nav-label">подписи</span></button>
@@ -107,7 +109,6 @@
     <script>
         const tg = window.Telegram.WebApp;
         
-        // Абсолютно изолированная функция инициализации, защищенная от любых сбоев
         function initWebApp() {
             try {
                 tg.ready();
@@ -120,38 +121,20 @@
                     document.getElementById('user-greeting-top').innerText = uname;
                     document.getElementById('user-fullname').innerText = user.first_name;
                     document.getElementById('user-username').innerText = user.username ? `@${user.username}` : `ID: ${user.id}`;
-                    document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
+                    document.getElementById('prof-ref-link').innerText = `https://t.me?start=ref_${user.id}`;
                     
                     if (user.photo_url) {
                         document.getElementById('avatar-placeholder').style.display = 'none';
                         const img = document.getElementById('avatar-img');
                         img.src = user.photo_url; img.style.display = 'block';
                     }
-                } else {
-                    // Резервный режим для обычного браузера, если Telegram не прислал контекст
-                    document.getElementById('user-greeting-top').innerText = "@guest_account";
-                    document.getElementById('user-fullname').innerText = "Гость";
-                    document.getElementById('user-username').innerText = "@guest_account";
                 }
             } catch (err) {
-                // Если произошел внутренний системный сбой
-                document.getElementById('user-greeting-top').innerText = "@offline_mode";
+                console.error(err);
             }
         }
         
-        // Запуск
         initWebApp();
-
-        let isSeller = true; 
-        if (isSeller) {
-            document.getElementById('role-title').innerText = "Продавец";
-            document.getElementById('seller-status-block').style.display = "flex";
-            document.getElementById('seller-actions').style.display = "block";
-        } else {
-            document.getElementById('role-title').innerText = "Покупатель";
-            document.getElementById('seller-status-block').style.display = "none";
-            document.getElementById('seller-actions').style.display = "none";
-        }
 
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
@@ -165,10 +148,21 @@
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
         function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
+        
         function copyRefLink() {
-            navigator.clipboard.writeText(document.getElementById('prof-ref-link').innerText).then(() => { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
+            const linkText = document.getElementById('prof-ref-link').innerText;
+            navigator.clipboard.writeText(linkText).then(() => {
+                if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
+            }).catch(() => {
+                // Резервный метод копирования, если Telegram блокирует буфер через Menu Button
+                const el = document.createElement('textarea');
+                el.value = linkText; document.body.appendChild(el); el.select();
+                document.execCommand('copy'); document.body.removeChild(el);
+                if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
+            });
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
+        
         function changeAvatar() { if (tg.showPopup) tg.showPopup({ title: 'Аватар', message: 'Синхронизируется с Telegram.', buttons: [{type: 'close'}] }); }
         
         function switchTab(tabId) {
@@ -176,8 +170,10 @@
             for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
             const buttons = document.getElementsByClassName('nav-button');
             for (let i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+            
             const activeTab = document.getElementById(tabId);
             if (activeTab) { activeTab.style.display = 'block'; }
+            
             const targetButton = document.getElementById('btn-' + tabId.replace('tab-', ''));
             if (targetButton) { targetButton.classList.add('active'); }
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
@@ -185,5 +181,3 @@
     </script>
 </body>
 </html>
-
-
