@@ -168,39 +168,39 @@
         tg.ready();
         tg.expand();
 
-        // Сбор данных из Telegram аккаунта
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            const usernameText = user.username ? `@${user.username}` : '';
-            
-            // Заменяем "Загрузка..." на username или Имя (у админов, продавцов и покупателей)
-            document.getElementById('user-greeting-top').innerText = usernameText || user.first_name;
-            
-            // Выводим только имя (без принудительной Фамилии)
-            document.getElementById('user-fullname').innerText = user.first_name;
-            
-            // Подставляем тег пользователя (или ID, если тега нет)
-            document.getElementById('user-username').innerText = usernameText || `ID: ${user.id}`;
-            
-            // Генерация реф. ссылки
-            document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
-            
-            if (user.photo_url) {
-                document.getElementById('avatar-placeholder').style.display = 'none';
-                const img = document.getElementById('avatar-img');
-                img.src = user.photo_url;
-                img.style.display = 'block';
+        // Главная функция получения и отрисовки данных
+        function initWebApp() {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                const usernameText = user.username ? `@${user.username}` : '';
+                
+                // Отображаем данные на экране
+                document.getElementById('user-greeting-top').innerText = usernameText || user.first_name;
+                document.getElementById('user-fullname').innerText = user.first_name;
+                document.getElementById('user-username').innerText = usernameText || `ID: ${user.id}`;
+                
+                // Ставим ваш точный юзернейм бота со скриншота
+                document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
+                
+                if (user.photo_url) {
+                    document.getElementById('avatar-placeholder').style.display = 'none';
+                    const img = document.getElementById('avatar-img');
+                    img.src = user.photo_url;
+                    img.style.display = 'block';
+                }
+            } else {
+                // Если открыли просто в браузере
+                document.getElementById('user-greeting-top').innerText = "@guest";
+                document.getElementById('user-fullname').innerText = "Гость";
+                document.getElementById('user-username').innerText = "@guest";
+                document.getElementById('prof-ref-link').innerText = "https://t.me";
             }
-        } else {
-            // Тестовые данные для обычного браузера
-            document.getElementById('user-greeting-top').innerText = "@test_user";
-            document.getElementById('user-fullname').innerText = "Тестовый Юзер";
-            document.getElementById('user-username').innerText = "@test_user";
         }
 
-        // Режим роли для теста (true - Продавец, false - Покупатель)
-        let isSeller = true; 
+        // Запускаем сбор данных сразу при старте
+        initWebApp();
 
+        let isSeller = true; 
         if (isSeller) {
             document.getElementById('role-title').innerText = "Продавец";
             document.getElementById('seller-status-block').style.display = "flex";
@@ -214,13 +214,8 @@
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
             const statusText = document.getElementById('status-text');
-            if (isChecked) {
-                statusText.innerText = "В СЕТИ";
-                statusText.style.color = "#007aff";
-            } else {
-                statusText.innerText = "ОФФЛАЙН";
-                statusText.style.color = "#8e8e93";
-            }
+            if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
+            else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
 
@@ -271,3 +266,4 @@
     </script>
 </body>
 </html>
+
