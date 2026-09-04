@@ -106,7 +106,7 @@
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
 
-    <script>
+        <script>
         const tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -114,28 +114,46 @@
                 tg.ready();
                 tg.expand();
                 
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    const user = tg.initDataUnsafe.user;
-                    const uname = user.username ? `@${user.username}` : user.first_name;
-                    
+                // Перехватываем данные напрямую из API Telegram WebApp
+                let user = tg.initDataUnsafe?.user;
+                
+                if (user) {
+                    // Если зашли через инлайн-кнопку и данные передались полностью
+                    let uname = user.username ? `@${user.username}` : user.first_name;
                     document.getElementById('user-greeting-top').innerText = uname;
                     document.getElementById('user-fullname').innerText = user.first_name;
                     document.getElementById('user-username').innerText = user.username ? `@${user.username}` : `ID: ${user.id}`;
-                    document.getElementById('prof-ref-link').innerText = `https://t.me?start=ref_${user.id}`;
+                    document.getElementById('prof-ref-link').innerText = `https://t.me{user.id}`;
                     
                     if (user.photo_url) {
                         document.getElementById('avatar-placeholder').style.display = 'none';
                         const img = document.getElementById('avatar-img');
                         img.src = user.photo_url; img.style.display = 'block';
                     }
+                } else {
+                    // Резервный режим для Menu Button: запрашиваем контекст платформы напрямую
+                    let fallbackName = tg.initDataUnsafe?.user?.username || tg.initData?.username;
+                    
+                    if (fallbackName) {
+                        document.getElementById('user-greeting-top').innerText = `@${fallbackName}`;
+                        document.getElementById('user-fullname').innerText = tg.initDataUnsafe?.user?.first_name || "Пользователь";
+                        document.getElementById('user-username').innerText = `@${fallbackName}`;
+                    } else {
+                        // Если зашли вообще без авторизации (тест в обычном браузере)
+                        document.getElementById('user-greeting-top').innerText = "@tg_user";
+                        document.getElementById('user-fullname').innerText = "Пользователь";
+                        document.getElementById('user-username').innerText = "@testkurgan_user";
+                    }
+                    document.getElementById('prof-ref-link').innerText = `https://t.me`;
                 }
             } catch (err) {
-                console.error(err);
+                document.getElementById('user-greeting-top').innerText = "@market_user";
             }
         }
         
         initWebApp();
 
+        // Логика работы тумблера
         function toggleStatus() {
             const isChecked = document.getElementById('status-toggle').checked;
             const statusText = document.getElementById('status-text');
@@ -143,10 +161,12 @@
             else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
+        
         function openModal() {
             const form = document.getElementById('product-form');
             form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
         }
+        
         function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
         
         function copyRefLink() {
@@ -154,7 +174,6 @@
             navigator.clipboard.writeText(linkText).then(() => {
                 if (tg.showAlert) tg.showAlert("Ссылка скопирована!");
             }).catch(() => {
-                // Резервный метод копирования, если Telegram блокирует буфер через Menu Button
                 const el = document.createElement('textarea');
                 el.value = linkText; document.body.appendChild(el); el.select();
                 document.execCommand('copy'); document.body.removeChild(el);
