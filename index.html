@@ -2,198 +2,137 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <!-- КРИТИЧЕСКИ ВАЖНО: Разрешаем скриптам Telegram работать без блокировки CORS -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Market</title>
-    <!-- Официальный скрипт Telegram WebApp -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>P2P Market Mini App</title>
+    <!-- Подключаем скрипт Telegram, чтобы сайт умел общаться с мессенджером -->
     <script src="https://telegram.org"></script>
+    
+    <!-- 🎨 БЛОК CSS: Здесь мы меняем дизайн, цвета и расположение элементов -->
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #000000; color: #ffffff; margin: 0; padding: 16px 16px 120px 16px; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
-        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #1c1c1e; }
-        .user-info h1 { font-size: 20px; margin: 0; font-weight: 700; }
-        .user-info p { font-size: 13px; color: #8e8e93; margin: 4px 0 0 0; }
-        .status-container { display: none; align-items: center; gap: 8px; }
-        .status-label { font-size: 12px; font-weight: 600; color: #8e8e93; }
-        .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2c2c2e; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: #007aff; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .tab-content { display: none; }
-        .card { background-color: #1c1c1e; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #2c2c2e; }
-        .btn-primary { background-color: #007aff; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 12px; color: #8e8e93; margin-bottom: 4px; }
-        .form-group input, .form-group textarea { width: 100%; background-color: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 8px; padding: 10px; color: white; box-sizing: border-box; font-family: inherit; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #1c1c1e; border-top: 1px solid #2c2c2e; display: flex; justify-content: space-around; align-items: center; padding-top: 10px; padding-bottom: max(18px, env(safe-area-inset-bottom)); box-sizing: border-box; z-index: 999999; }
-        .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: #8e8e93; cursor: pointer; width: 24%; height: 50px; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        .nav-icon { font-size: 18px; margin-bottom: 2px; pointer-events: none; }
-        .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2px; pointer-events: none; }
-        .nav-button.active { color: #007aff !important; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            /* Переменные ниже автоматически берут цвета из темы Telegram пользователя (темная/светлая) */
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #222222);
+            margin: 0;
+            padding: 16px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Стиль карточки товара — меняйте border-radius, background и shadow для изменения вида */
+        .product-card {
+            background-color: var(--tg-theme-secondary-bg-color, #f4f4f6);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .product-price {
+            font-size: 20px;
+            color: #34c759; /* Красивый зеленый цвет для цены */
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        /* 🔘 КНОПКА: Здесь настраивается внешний вид кнопки */
+        .btn-buy {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-buy:active {
+            filter: brightness(0.9); /* Эффект затемнения при нажатии */
+        }
     </style>
 </head>
 <body>
-
-    <div class="header-container">
-        <div class="user-info">
-            <h1 id="role-title">Покупатель</h1>
-            <p id="user-greeting-top">Загрузка...</p>
-        </div>
-        <div class="status-container" id="seller-status-block">
-            <span class="status-label" id="status-text">ОФФЛАЙН</span>
-            <label class="switch">
-                <input type="checkbox" id="status-toggle" onchange="toggleStatus()">
-                <span class="slider"></span>
-            </label>
-        </div>
+    <!-- 👤 БЛОК ПОЛЬЗОВАТЕЛЬ: Аватар и username -->
+    <div style="text-align: center; margin-bottom: 24px;">
+        <img id="userAvatar" src="" alt="User Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--tg-theme-secondary-bg-color, #f4f4f6);">
+        <div id="userUsername" style="margin-top: 8px; font-size: 16px; color: var(--tg-theme-text-color, #222222);"></div>
     </div>
 
-    <!-- Вкладки экранов -->
-    <div id="tab-signatures" class="tab-content" style="display: block;">
-        <div id="seller-actions" style="display: none; margin-bottom: 20px;">
-            <button class="btn-primary" onclick="openModal()">＋ ПРОДАЖА (Добавить товар)</button>
-            <div id="product-form" class="card" style="display: none; border-color: #007aff;">
-                <h3>Новое объявление</h3>
-                <div class="form-group"><label>Название товара</label><input type="text" id="prod-name"></div>
-                <div class="form-group"><label>Описание</label><textarea id="prod-desc" rows="3"></textarea></div>
-                <div class="form-group"><label>Цена (₽)</label><input type="number" id="prod-price"></div>
-                <button class="btn-primary" style="margin: 8px 0 0 0;" onclick="saveProduct()">Выйти в общую сеть</button>
-            </div>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #ffffff; font-size: 16px; font-weight: 500;">Нет активных продавцов</p></div>
+    <h2>🛍 Витрина товаров</h2>
+    
+    <!-- Перечень товаров (в будущем этот блок будет генерироваться автоматически из БД) -->
+    <div class="product-card">
+        <div class="product-title">Premium Account</div>
+        <div class="product-desc">Доступ на 30 дней, высокая скорость, круглосуточная поддержка.</div>
+        <div class="product-price">$12.50</div>
+        <!-- Кнопка вызывает JavaScript функцию и передает ID продавца (1) и ID товара (101) -->
+        <button class="btn-buy" onclick="buyProduct(1, 101)">💬 Связаться с продавцом</button>
     </div>
 
-    <div id="tab-chats" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">У вас нет активных чатов</p></div>
-    </div>
-
-    <div id="tab-disputes" class="tab-content">
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 40vh; text-align: center;"><p style="color: #8e8e93; font-size: 16px; font-weight: 500;">Нет активных споров</p></div>
-    </div>
-
-    <div id="tab-profile" class="tab-content">
-        <div style="display: flex; align-items: center; margin-bottom: 24px; padding: 10px 0;">
-            <div onclick="changeAvatar()" style="width: 70px; height: 70px; border-radius: 50%; background-color: #2c2c2e; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 2px solid #007aff; overflow: hidden; flex-shrink: 0;">
-                <span id="avatar-placeholder" style="font-size: 28px; color: #8e8e93;">👤</span>
-                <img id="avatar-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;">
-            </div>
-            <div style="margin-left: 16px; display: flex; flex-direction: column; justify-content: center;">
-                <span id="user-fullname" style="font-size: 18px; font-weight: 700; color: #ffffff;">Имя</span>
-                <span id="user-username" style="font-size: 14px; color: #8e8e93; margin-top: 2px;">@username</span>
-            </div>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш баланс:</span><span style="font-weight: 600;" id="prof-balance">0.00 ₽</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Взято подписей:</span><span style="font-weight: 600;" id="prof-signatures">0</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Успешных сделок:</span><span style="font-weight: 600;" id="prof-deals">0</span></div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #1c1c1e; padding-bottom: 8px;"><span style="color: #8e8e93;">Ваш реферальный процент:</span><span style="font-weight: 600; color: #007aff;" id="prof-ref-percent">5%</span></div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <span style="color: #8e8e93;">Ваша реф. ссылка:</span>
-                <script>
+    <!-- ⚙️ БЛОК JAVASCRIPT: Логика кнопок и отправка данных в бот -->
+    <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Раскрывает окно Mini App на максимум вверх при открытии
         
-        // Небольшая задержка, чтобы гарантированно получить данные
-        setTimeout(() => {
-            const user = tg.initDataUnsafe.user;
-            
-            if (!user) {
-                console.log("User data not available");
-                return;
-            }
-            
-            // Выводим username или имя
-            const usernameEl = document.getElementById('userUsername');
-            if (user.username) {
-                usernameEl.innerHTML = `@<span style="color: var(--tg-theme-text-color, #222222);">${user.username}</span>`;
-            } else if (user.first_name) {
-                usernameEl.textContent = user.first_name;
-            } else {
-                usernameEl.textContent = 'Пользователь';
-            }
-            
-            // Выводим аватарку
-            const avatarEl = document.getElementById('userAvatar');
-            // Пытаемся разные варианты аватара
-            if (user.is_premium) {
-                avatarEl.src = `https://t.me/i/user_${user.id}_premium.jpg`;
-            } else {
-                avatarEl.src = `https://t.me/i/user_${user.id}.jpg`;
-            }
-        }, 300); // 300мс подождем, чтобы WebApp успел загрузиться
-</script>
-
-                    
-                    if (tgWebAppData) {
-                        var decodedData = decodeURIComponent(tgWebAppData);
-                        var userMatch = decodedData.match(/"user"\s*:\s*({[^}]+})/);
-                        if (userMatch && userMatch[1]) {
-                            try {
-                                var parsedUser = JSON.parse(userMatch[1]);
-                                userId = parsedUser.id ? parsedUser.id.toString() : "0";
-                                firstName = parsedUser.first_name || "Пользователь";
-                                username = parsedUser.username || "user";
-                            } catch(e) {}
-                        }
-                    }
-                }
-
-                document.getElementById('user-greeting-top').innerText = "@" + username;
-                document.getElementById('user-fullname').innerText = firstName;
-                document.getElementById('user-username').innerText = "@" + username;
-                document.getElementById('prof-ref-link').innerText = "https://t.me_" + userId;
-
-                if (webAppUser && webAppUser.photo_url) {
-                    document.getElementById('avatar-placeholder').style.display = 'none';
-                    var img = document.getElementById('avatar-img');
-                    img.src = webAppUser.photo_url; 
-                    img.style.display = 'block';
-                }
-            } catch (err) {
-                document.getElementById('user-greeting-top').innerText = "@error_init";
-            }
-        }
-
-        var isSeller = true; 
-        if (isSeller) {
-            document.getElementById('role-title').innerText = "Продавец";
-            document.getElementById('seller-status-block').style.display = "flex";
-            document.getElementById('seller-actions').style.display = "block";
-        }
-
-        function toggleStatus() {
-            var isChecked = document.getElementById('status-toggle').checked;
-            var statusText = document.getElementById('status-text');
-            if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
-            else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
-        function openModal() {
-            var form = document.getElementById('product-form');
-            form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
-        }
-        function saveProduct() { alert('Товар отправлен в общую сеть!'); document.getElementById('product-form').style.display = 'none'; }
+        // 👤 Получаем данные пользователя из Telegram
+        const user = tg.initDataUnsafe.user;
         
-        function copyRefLink() {
-            var linkText = document.getElementById('prof-ref-link').innerText;
-            navigator.clipboard.writeText(linkText).then(function() { if (tg.showAlert) tg.showAlert("Ссылка скопирована!"); });
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        // Выводим username (например, @username)
+        const usernameEl = document.getElementById('userUsername');
+        if (user && user.username) {
+            usernameEl.textContent = `@${user.username}`;
+        } else if (user && user.first_name) {
+            usernameEl.textContent = user.first_name;
+        } else {
+            usernameEl.textContent = 'Пользователь';
         }
-        function changeAvatar() { if (tg.showPopup) tg.showPopup({ title: 'Аватар', message: 'Синхронизируется с Telegram.', buttons: [{type: 'close'}] }); }
         
-        function switchTab(tabId) {
-            var contents = document.getElementsByClassName('tab-content');
-            for (var i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; }
-            var buttons = document.getElementsByClassName('nav-button');
-            for (var i = 0; i < buttons.length; i++) { buttons[i].classList.remove('active'); }
+        // Выводим аватарку пользователя
+        const avatarEl = document.getElementById('userAvatar');
+        if (user) {
+            // Формируем URL аватарки из ID пользователя
+            // Этот формат работает для большинства пользователей в Telegram
+            avatarEl.src = `https://t.me/i/user_${user.id}.jpg`;
+            // Альтернативно, если есть photo_url в initData:
+            // if (user.photo_url) {
+            //     avatarEl.src = user.photo_url;
+            // }
+        }
+
+        function buyProduct(sellerId, productId) {
+            // Формируем данные, которые полетят в ваш Python-код
+            const dataData = {
+                action: "start_deal",
+                seller_id: sellerId,
+                product_id: productId
+            };
+
+            // Отправляем данные в чат боту (в формате текста JSON)
+            tg.sendData(JSON.stringify(dataData));
             
-            var activeTab = document.getElementById(tabId);
-            if (activeTab) { activeTab.style.display = 'block'; }
-            var targetButton = document.getElementById('btn-' + tabId.replace('tab-', ''));
-            if (targetButton) { targetButton.classList.add('active'); }
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            // Автоматически закрываем Mini App после клика
+            tg.close();
         }
     </script>
 </body>
