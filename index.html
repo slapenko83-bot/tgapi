@@ -104,7 +104,7 @@
         <button id="btn-disputes" class="nav-button" onclick="switchTab('tab-disputes')"><span class="nav-icon">⚖️</span><span class="nav-label">споры</span></button>
         <button id="btn-profile" class="nav-button" onclick="switchTab('tab-profile')"><span class="nav-icon">👤</span><span class="nav-label">профиль</span></button>
     </div>
-        <script>
+            <script>
         var tg = window.Telegram.WebApp;
         
         function initWebApp() {
@@ -112,29 +112,14 @@
                 tg.ready();
                 tg.expand();
                 
-                var userId = "0";
-                var firstName = "Пользователь";
-                var username = "tg_user";
+                // Самый надежный, стандартный метод Telegram без разбора строк
+                var user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : null;
                 
-                var startParam = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+                var userId = user ? user.id : "0";
+                var firstName = user ? user.first_name : "Пользователь";
+                var username = user && user.username ? user.username : "tg_user";
                 
-                // Финальный, исправленный разбор без индексов i+1
-                if (startParam && startParam.indexOf("-name-") !== -1) {
-                    var partId = startParam.split("id-")[1];
-                    if (partId) userId = partId.split("-name-")[0];
-                    
-                    var partName = startParam.split("-name-")[1];
-                    if (partName) firstName = decodeURIComponent(partName.split("-user-")[0]);
-                    
-                    var partUser = startParam.split("-user-")[1];
-                    if (partUser) username = decodeURIComponent(partUser);
-                } else if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    var user = tg.initDataUnsafe.user;
-                    userId = user.id;
-                    firstName = user.first_name;
-                    username = user.username || "user";
-                }
-                
+                // Выводим данные на экраны
                 document.getElementById('user-greeting-top').innerText = "@" + username;
                 document.getElementById('user-fullname').innerText = firstName;
                 document.getElementById('user-username').innerText = "@" + username;
@@ -161,7 +146,7 @@
             var isChecked = document.getElementById('status-toggle').checked;
             var statusText = document.getElementById('status-text');
             if (isChecked) { statusText.innerText = "В СЕТИ"; statusText.style.color = "#007aff"; }
-            else { statusText.innerText = "ОФФЛАЙН"; statusText.style.color = "#8e8e93"; }
+            else { statusText.innerText = "ОФФЛАЙ延"; statusText.style.color = "#8e8e93"; }
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         function openModal() {
